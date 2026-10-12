@@ -1,0 +1,32 @@
+export type Channel = '매장' | '포장';
+export type Evidence = { material_id: string; effective_date: string; unit_cost: string; quantity: string; channel_only?: string };
+export type Sale = {
+  sale_id: string; date: string; menu_id: string; channel: Channel; quantity: string;
+  unit_price: string; discount_amount: string; net_sales: string; payment_fee: string;
+  recipe_version: string; unit_food_cost_snapshot: string | null; unit_packaging_cost_snapshot: string | null;
+  cost_evidence?: Evidence[]; cost_issues?: string[]; calculation_version?: string;
+};
+export type Menu = { menu_id: string; name: string; price: string; category: string; recipe_version: string };
+export type Material = { material_id: string; name: string; unit: string; supplier_id: string };
+export type Recipe = { recipe_version: string; menu_id: string; material_id: string; quantity: string; unit: string; channel_only?: Channel };
+export type Price = { material_id: string; effective_date: string; pack_price: string; pack_quantity: string };
+export type Calendar = { date: string; is_open: boolean; record_complete: boolean; confirmation_needed?: boolean };
+export type WasteEvidence = { effective_date: string; pack_price: string; pack_quantity: string; unit_cost: string; calculation_version: string; source: '가격이력 평가' };
+export type InventoryEvent = { event_id: string; date: string; material_id: string; event_type: string; quantity: string; unit: string; counted_quantity?: string; unit_cost?: string; supplier_id?: string; reason?: string; waste_cost?: string | null; valuation_evidence?: WasteEvidence; valuation_issues?: string[] };
+export type Expense = { expense_id: string; date: string; category: string; amount: string; recognition?: string };
+export type ExpenseInput = Pick<Expense, 'date' | 'category' | 'amount'>;
+export type InventoryInput = { date: string; material_id: string; event_type: '입고' | '폐기'; quantity: string; unit: string; unit_cost: string; supplier_id: string; reason: string };
+export type Dataset = {
+  meta: { dataset_id: string; store_name: string; start_date: string; as_of: string; data_class: string; amount_basis: string; [key: string]: unknown };
+  suppliers: { supplier_id: string; name: string }[];
+  materials: Material[]; menus: Menu[]; recipes: Recipe[]; price_history: Price[];
+  calendar: Calendar[]; sales: Sale[];
+  opening_inventory: { material_id: string; date: string; quantity: string; unit: string }[];
+  inventory_events: InventoryEvent[];
+  expenses: Expense[];
+  monthly_expense_plan: { month: string; category: string; amount: string }[];
+  settings: Record<string, unknown>;
+};
+export type SaleInput = Pick<Sale, 'date' | 'menu_id' | 'channel' | 'quantity' | 'unit_price' | 'discount_amount' | 'payment_fee'>;
+export type AppMeta = { key: 'active'; generationId: string; revision: number; schemaVersion: number; calculationVersion: string; initialized: boolean; datasetMeta: Dataset['meta']; settings: Dataset['settings']; wasteEvaluationReady?: boolean };
+export type Snapshot = { data: Dataset; meta: AppMeta };
